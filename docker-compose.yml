@@ -18,6 +18,13 @@ services:
       - hive-metastore-postgresql
       - presto-coordinator
 
+  finra-q3:
+    build:
+      context: Dockers/FINRA/Q3_Q4
+    volumes:
+      - .:/project      
+    entrypoint: ["python", "/project/actors.py", "actors.csv"]
+
   namenode:
     image: bde2020/hadoop-namenode:2.0.0-hadoop2.7.4-java8
     volumes:
@@ -43,7 +50,7 @@ services:
     env_file:
       - ./hadoop-hive.env
     volumes:
-      - ./target:/tmp/target
+      - ./target:/target
     environment:
       HIVE_CORE_CONF_javax_jdo_option_ConnectionURL: "jdbc:postgresql://hive-metastore/metastore"
       SERVICE_PRECONDITION: "hive-metastore:9083"

@@ -2,7 +2,7 @@
 ----------------
 -- UDAF SETUP --
 ----------------
-add jar /tmp/target/fred-hive-0.1.jar;
+add jar /target/fred-hive-0.1.jar;
 DROP FUNCTION timeinterval;
 CREATE FUNCTION timeinterval AS 'com.fred.platform.hive.udaf.TimeInterval';
 
