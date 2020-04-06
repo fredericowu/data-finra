@@ -1,15 +1,32 @@
 version: "3"
 
 services:
-  finra-q2:
+  finra-q1:
     build:
-      context: Dockers/FINRA/Q2
+      context: Dockers/FINRA/Hive
     environment:
       - JAVA_HOME=/usr/lib/jvm/java
       - MAVEN_HOME=/usr/share/maven
     volumes:
       - .:/project
-    entrypoint: /project/Dockers/FINRA/Q2/run.sh
+    entrypoint: /project/Dockers/FINRA/Hive/run_q1.sh
+    depends_on:
+      - hive-server
+      - namenode
+      - datanode
+      - hive-metastore
+      - hive-metastore-postgresql
+      - presto-coordinator
+
+  finra-q2:
+    build:
+      context: Dockers/FINRA/Hive
+    environment:
+      - JAVA_HOME=/usr/lib/jvm/java
+      - MAVEN_HOME=/usr/share/maven
+    volumes:
+      - .:/project
+    entrypoint: /project/Dockers/FINRA/Hive/run_q2.sh
     depends_on:
       - hive-server
       - namenode
@@ -20,10 +37,17 @@ services:
 
   finra-q3:
     build:
-      context: Dockers/FINRA/Q3_Q4
+      context: Dockers/FINRA/Python
     volumes:
       - .:/project      
-    entrypoint: ["python", "/project/actors.py", "actors.csv"]
+    entrypoint: ["python", "/project/actors.py", "/project/actors.csv"]
+
+  finra-q4:
+    build:
+      context: Dockers/FINRA/Python
+    volumes:
+      - .:/project      
+    entrypoint: ["python", "/project/arcade.py", "/project/arcade.csv"]
 
   namenode:
     image: bde2020/hadoop-namenode:2.0.0-hadoop2.7.4-java8
@@ -50,7 +74,7 @@ services:
     env_file:
       - ./hadoop-hive.env
     volumes:
-      - ./target:/target
+      - ./fred-hive:/fred-hive
     environment:
       HIVE_CORE_CONF_javax_jdo_option_ConnectionURL: "jdbc:postgresql://hive-metastore/metastore"
       SERVICE_PRECONDITION: "hive-metastore:9083"
